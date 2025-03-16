@@ -49,7 +49,11 @@ public class ProductService {
         return "Product Deleted Successfully";
     }
 
-    // TODO: Method to search products by name
+
+
+    public List<Product> findByName(String name){
+    	return productRepository.findByNameIgnoreCaseContaining(name);
+    }
 
 
     // TODO: Method to filter products by category
