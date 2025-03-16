@@ -9,6 +9,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import java.util.List;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Autowired;
+
+
+
 import java.util.*;
 
 @RestController
@@ -25,8 +38,14 @@ public class ProductController {
     }
 
     @GetMapping("")
-    public List<Product> getAllProducts() {
-        return productService.getAllProducts();
+    public ResponseEntity<Page<Product>> getAllProducts(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "3") int pageSize,
+        @RequestParam(defaultValue = "id") String sortBy,
+        @RequestParam(defaultValue = "asc") String sortDir
+    ) {
+    Page<Product> products = productService.getAllProducts(page, pageSize, sortBy, sortDir);
+    return ResponseEntity.ok(products);
     }
 
 
@@ -56,16 +75,32 @@ public class ProductController {
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
 
-    // TODO: API to search products by name
+  
+    @GetMapping("/search")
+    public ResponseEntity<List<Product>> searchProducts(@RequestParam String name){
+        List<Product> products = productService.searchProductsByName(name);
+        return new ResponseEntity<>(products, HttpStatus.OK);
+    }
 
 
-    // TODO: API to filter products by category
+    @GetMapping("/filter/category")
+    public ResponseEntity<List<Product>> filterByCategory(@RequestParam String category){
+        List<Product> products = productService.searchProductsByCategory(category);
+        return new ResponseEntity<>(products, HttpStatus.OK);
+    }
+
+    
+    @GetMapping("/filter/price")
+    public ResponseEntity<List<Product>> filterByPrice(@RequestParam Double minPrice, @RequestParam Double maxPrice) {
+        List<Product> products = productService.filterProductsByPriceBetween(minPrice, maxPrice);
+        return new ResponseEntity<>(products, HttpStatus.OK);
+    }
 
 
-    // TODO: API to filter products by price range
-
-
-    // TODO: API to filter products by stock quantity range
-
+    @GetMapping("/filter/stock")
+    public ResponseEntity<List<Product>> filterByStock(@RequestParam Integer minStock, @RequestParam Integer maxStock) {
+        List<Product> products = productService.filterProductsByStockRange(minStock, maxStock);
+        return new ResponseEntity<>(products, HttpStatus.OK);
+    }
 
 }
